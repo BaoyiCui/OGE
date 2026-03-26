@@ -1,0 +1,6 @@
+#ifndef __VERSION_H__
+#define __VERSION_H__
+
+#define OGE_VERSION "@OGE_VERSION@"
+
+#endif // __VERSION_H__
