@@ -6,8 +6,9 @@
 #define ORBITALGAMEENV_UTILS_H
 
 #include <cmath>
+#include <chrono>
 
-#include "../common/constants.h"
+#include "oge/common/constants.h"
 #include "oge/simcore/propagator.h"
 
 namespace oge
@@ -115,6 +116,25 @@ namespace oge
         const Eigen::Vector3d& V_J2000,
         Eigen::Vector3d& R_LVLH,
         Eigen::Vector3d& V_LVLH);
+
+    //年月日时分秒转化为儒略日
+    double JulianDay(std::chrono::sys_time<std::chrono::seconds> & UTC);
+
+    //年月日时分秒转化为MJD儒略日
+    double JulianDay_Modified(std::chrono::sys_time<std::chrono::seconds>& UTC);
+
+    //UTC时间转换为TDT时间. 输入: UTC MJD格式的UTC.
+    double UTC_TDT(double MJD);
+
+    //TDT时间转换为MJD格式的UTC时间. 输入: TDT MJD格式的TDT.
+    double TDT_UTC(double TDT);
+
+    //MJD时间转换为UTC时间. 输入: MJD时间.
+    void MJD_UTC(double MJD, std::chrono::sys_time<std::chrono::seconds>& UTC);
+
+    // 计算太阳在 J2000 坐标系下的位置
+    void solar_position(double jd, Eigen::Vector3d& pos_sun_j2000);
+    void solar_position(const std::chrono::sys_time<std::chrono::seconds>& UTC, Eigen::Vector3d& pos_sun_j2000);
 }
 
 #endif //ORBITALGAMEENV_UTILS_H

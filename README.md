@@ -2,7 +2,37 @@
 
 ## 1. 开发环境配置
 
-### 1.1 安装 vcpkg
+### 1.1 更新 gcc
+
+安装 GCC 13
+
+```
+sudo apt update
+sudo apt install gcc-13 g++-13
+```
+
+设置为默认版本
+
+```
+sudo update-alternatives --install /usr/bin/gcc gcc /usr/bin/gcc-13 100
+sudo update-alternatives --install /usr/bin/g++ g++ /usr/bin/g++-13 100
+```
+
+如果系统里有多个版本，可以用以下命令切换：
+
+```
+sudo update-alternatives --config gcc                                                                                                                                                                                
+sudo update-alternatives --config g++
+```
+
+安装完后验证：
+
+```
+gcc --version                                                                                                                                                                                                        
+g++ --version
+```
+
+### 1.2 安装 vcpkg
 
 克隆 `vcpkg` 并且执行安装
 
@@ -21,7 +51,7 @@ export PATH=$VCPKG_ROOT:$PATH
 # <<< vcpkg
 ```
 
-### 1.2 Python 环境配置
+### 1.3 Python 环境配置
 
 创建 `conda` 环境并且安装基础依赖
 

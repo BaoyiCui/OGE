@@ -9,6 +9,7 @@ namespace oge
 {
     // 地球引力常数 (km^3/s^2)
     inline constexpr double MU = 398600.4418;
+    inline constexpr double AU = 149597870.691; // Astronomical unit (km)
 }
 
 #endif //ORBITALGAMEENV_CONSTANTS_H
