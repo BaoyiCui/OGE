@@ -20,10 +20,6 @@
 #include "oge/oge_interface.h"
 #include "version.h"
 
-#ifdef BUILD_VECTOR_LIB
-#include "oge/python/oge_vector_python_interface.h"
-#endif
-
 namespace nb = nanobind;
 using namespace nb::literals;
 void init_vector_module(nb::module_& m);
@@ -101,9 +97,6 @@ NB_MODULE(_oge_py, m)
         .def("getBool", &oge::OGEPythonInterface::getBool, "key"_a, "strict"_a = false)
         .def("getString", &oge::OGEPythonInterface::getString, "key"_a, "strict"_a = false);
 
-#ifdef BUILD_VECTOR_LIB
-    init_vector_module(m);
-#endif
 }
 
 #endif //ORBITALGAMEENV_OGE_PYTHON_INTERFACE_H

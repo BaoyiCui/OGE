@@ -15,9 +15,16 @@ export PATH=$VCPKG_ROOT:$PATH
 ```
 
 ### 1.2 Python 环境配置
+创建 `conda` 环境并且安装基础依赖
 ```bash
 conda create -n oge python=3.13
-conda activate marppo
+conda activate oge
+pip install -r requirements.txt -i https://pypi.mirrors.ustc.edu.cn/simple/
+```
+安装 `skrl` 库
+```bash
+conda activate oge
+cd 
 ```
 
 ## 2. 安装 OGE 
