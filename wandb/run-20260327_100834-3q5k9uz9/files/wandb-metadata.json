@@ -1,0 +1,40 @@
+{
+  "os": "Linux-6.17.0-19-generic-x86_64-with-glibc2.39",
+  "python": "CPython 3.13.11",
+  "startedAt": "2026-03-27T02:08:34.376203Z",
+  "program": "/home/baoyicui/Workspaces/OGE/scripts/train.py",
+  "codePath": "scripts/train.py",
+  "codePathLocal": "scripts/train.py",
+  "git": {
+    "remote": "https://github.com/BaoyiCui/OGE.git",
+    "commit": "3445a7bbd275e395779cc5f30103d099772105d0"
+  },
+  "email": "3239177665@qq.com",
+  "root": "/home/baoyicui/Workspaces/OGE",
+  "host": "baoyicui-MS-7E49",
+  "executable": "/home/baoyicui/Environments/miniconda3/envs/oge/bin/python",
+  "cpu_count": 16,
+  "cpu_count_logical": 32,
+  "gpu": "NVIDIA GeForce RTX 5090",
+  "gpu_count": 1,
+  "disk": {
+    "/": {
+      "total": "1474191622144",
+      "used": "299467001856"
+    }
+  },
+  "memory": {
+    "total": "64830210048"
+  },
+  "gpu_nvidia": [
+    {
+      "name": "NVIDIA GeForce RTX 5090",
+      "memoryTotal": "34190917632",
+      "cudaCores": 21760,
+      "architecture": "Blackwell",
+      "uuid": "GPU-55b0f5d7-5a85-77b7-7926-5fdf050bcdb2"
+    }
+  ],
+  "cudaVersion": "13.0",
+  "writerId": "uadtplqqb7xc49aavhlor3gqpr9jtf9a"
+}

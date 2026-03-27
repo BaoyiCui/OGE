@@ -1,0 +1,33 @@
+Starting PPO training on OGE (red_sat)
+ 29%|█████████████████████████████████████████████████▏                                                                                                                     | 294895/1000000 [03:15<07:47, 1508.27it/s]
+Traceback (most recent call last):
+  File "/home/baoyicui/Workspaces/OGE/scripts/train.py", line 74, in <module>
+    main()
+    ~~~~^^
+  File "/home/baoyicui/Workspaces/OGE/scripts/train.py", line 70, in main
+    trainer.train()
+    ~~~~~~~~~~~~~^^
+  File "/home/baoyicui/Workspaces/OGE/third_party/skrl-1.4.3/skrl/trainers/torch/sequential.py", line 86, in train
+    self.single_agent_train()
+    ~~~~~~~~~~~~~~~~~~~~~~~^^
+  File "/home/baoyicui/Workspaces/OGE/third_party/skrl-1.4.3/skrl/trainers/torch/base.py", line 203, in single_agent_train
+    self.agents.record_transition(
+    ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~^
+        states=states,
+        ^^^^^^^^^^^^^^
+    ...<7 lines>...
+        timesteps=self.timesteps,
+        ^^^^^^^^^^^^^^^^^^^^^^^^^
+    )
+    ^
+  File "/home/baoyicui/Workspaces/OGE/third_party/skrl-1.4.3/skrl/agents/torch/ppo/ppo.py", line 281, in record_transition
+    super().record_transition(
+    ~~~~~~~~~~~~~~~~~~~~~~~~~^
+        states, actions, rewards, next_states, terminated, truncated, infos, timestep, timesteps
+        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    )
+    ^
+  File "/home/baoyicui/Workspaces/OGE/third_party/skrl-1.4.3/skrl/agents/torch/base.py", line 330, in record_transition
+    self.tracking_data["Reward / Instantaneous reward (max)"].append(torch.max(rewards).item())
+                                                                     ~~~~~~~~~~~~~~~~~~~~~~~^^
+KeyboardInterrupt

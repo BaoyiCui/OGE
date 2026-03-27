@@ -1,0 +1,23 @@
+Starting PPO training on OGE (red_sat)
+  0%|                                                                                                                                                                                      | 0/1000000 [00:00<?, ?it/s]torch.Size([1, 0, 3])
+blue_action.shape:  (3,)
+red_action.shape:  (0, 3)
+combined_actions.shape:  (1, 3)
+  0%|                                                                                                                                                                                      | 0/1000000 [00:00<?, ?it/s]
+Traceback (most recent call last):
+  File "/home/baoyicui/Workspaces/OGE/scripts/train.py", line 70, in <module>
+    main()
+    ~~~~^^
+  File "/home/baoyicui/Workspaces/OGE/scripts/train.py", line 66, in main
+    trainer.train()
+    ~~~~~~~~~~~~~^^
+  File "/home/baoyicui/Workspaces/OGE/third_party/skrl-1.4.3/skrl/trainers/torch/sequential.py", line 86, in train
+    self.single_agent_train()
+    ~~~~~~~~~~~~~~~~~~~~~~~^^
+  File "/home/baoyicui/Workspaces/OGE/third_party/skrl-1.4.3/skrl/trainers/torch/base.py", line 196, in single_agent_train
+    next_states, rewards, terminated, truncated, infos = self.env.step(actions)
+                                                         ~~~~~~~~~~~~~^^^^^^^^^
+  File "/home/baoyicui/Workspaces/OGE/modules/env_wrapper.py", line 52, in step
+    self._oge.act(combined_actions)
+    ~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^
+ValueError: agents_actions.size() != num_agents

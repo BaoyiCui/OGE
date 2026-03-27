@@ -1,0 +1,30 @@
+Starting PPO training on OGE (red_sat)
+  0%|                                                                                                                                                                                      | 0/1000000 [00:00<?, ?it/s]
+Traceback (most recent call last):
+  File "/home/baoyicui/Workspaces/OGE/scripts/train.py", line 74, in <module>
+    main()
+    ~~~~^^
+  File "/home/baoyicui/Workspaces/OGE/scripts/train.py", line 70, in main
+    trainer.train()
+    ~~~~~~~~~~~~~^^
+  File "/home/baoyicui/Workspaces/OGE/third_party/skrl-1.4.3/skrl/trainers/torch/sequential.py", line 86, in train
+    self.single_agent_train()
+    ~~~~~~~~~~~~~~~~~~~~~~~^^
+  File "/home/baoyicui/Workspaces/OGE/third_party/skrl-1.4.3/skrl/trainers/torch/base.py", line 193, in single_agent_train
+    actions = self.agents.act(states, timestep=timestep, timesteps=self.timesteps)[0]
+              ~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/baoyicui/Workspaces/OGE/third_party/skrl-1.4.3/skrl/agents/torch/ppo/ppo.py", line 243, in act
+    actions, log_prob, outputs = self.policy.act({"states": self._state_preprocessor(states)}, role="policy")
+                                                            ~~~~~~~~~~~~~~~~~~~~~~~~^^^^^^^^
+  File "/home/baoyicui/Environments/miniconda3/envs/oge/lib/python3.13/site-packages/torch/nn/modules/module.py", line 1776, in _wrapped_call_impl
+    return self._call_impl(*args, **kwargs)
+           ~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^
+  File "/home/baoyicui/Environments/miniconda3/envs/oge/lib/python3.13/site-packages/torch/nn/modules/module.py", line 1787, in _call_impl
+    return forward_call(*args, **kwargs)
+  File "/home/baoyicui/Workspaces/OGE/third_party/skrl-1.4.3/skrl/resources/preprocessors/torch/running_standard_scaler.py", line 152, in forward
+    return self._compute(x, train, inverse)
+           ~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^
+  File "/home/baoyicui/Workspaces/OGE/third_party/skrl-1.4.3/skrl/resources/preprocessors/torch/running_standard_scaler.py", line 110, in _compute
+    (x - self.running_mean.float()) / (torch.sqrt(self.running_variance.float()) + self.epsilon),
+     ~~^~~~~~~~~~~~~~~~~~~~~~~~~~~
+RuntimeError: The size of tensor a (9) must match the size of tensor b (4) at non-singleton dimension 2

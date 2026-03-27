@@ -1,0 +1,19 @@
+{"time":"2026-03-27T10:16:49.318267726+08:00","level":"INFO","msg":"wandb-core"}
+{"time":"2026-03-27T10:16:49.319455542+08:00","level":"INFO","msg":"stream: starting","core version":"0.25.1"}
+{"time":"2026-03-27T10:16:49.869945943+08:00","level":"INFO","msg":"stream: created new stream","id":"g0y69njf"}
+{"time":"2026-03-27T10:16:49.869983025+08:00","level":"INFO","msg":"handler: started"}
+{"time":"2026-03-27T10:16:49.870044347+08:00","level":"INFO","msg":"stream: started"}
+{"time":"2026-03-27T10:16:49.870063168+08:00","level":"INFO","msg":"sender: started"}
+{"time":"2026-03-27T10:16:49.870060638+08:00","level":"INFO","msg":"writer: started","stream_id":"g0y69njf"}
+{"time":"2026-03-27T10:16:50.698778158+08:00","level":"INFO","msg":"filestream: sending request","total_files":1,"console_offset":0,"console_lines":1}
+{"time":"2026-03-27T10:16:50.72495215+08:00","level":"INFO","msg":"stream: closing"}
+{"time":"2026-03-27T10:16:51.234028988+08:00","level":"INFO","msg":"filestream: request sent","status":"200 OK"}
+{"time":"2026-03-27T10:17:00.697749144+08:00","level":"WARN","msg":"tensorboard: no root directory","error":"timed out after 10s"}
+{"time":"2026-03-27T10:17:00.697822846+08:00","level":"INFO","msg":"tensorboard: tracking new log directory","rootDir":{},"logDir":"LocalOrCloudPath(LocalPath=\"/home/baoyicui/Workspaces/OGE/runs/ppo_oge/26-03-27_10-16-47-943588_PPO\")","namespace":""}
+{"time":"2026-03-27T10:17:00.698050565+08:00","level":"INFO","msg":"tensorboard: saving file","fileLocation":"/home/baoyicui/Workspaces/OGE/runs/ppo_oge/26-03-27_10-16-47-943588_PPO/events.out.tfevents.1774577810.baoyicui-MS-7E49.149816.0","runPath":"runs/ppo_oge/26-03-27_10-16-47-943588_PPO/events.out.tfevents.1774577810.baoyicui-MS-7E49.149816.0"}
+{"time":"2026-03-27T10:17:02.454595544+08:00","level":"INFO","msg":"fileTransfer: Close: file transfer manager closed"}
+{"time":"2026-03-27T10:17:02.454710338+08:00","level":"INFO","msg":"filestream: sending request","total_files":2,"console_offset":1,"console_lines":19,"uploaded_len":6,"complete":true,"exit_code":1}
+{"time":"2026-03-27T10:17:03.059140044+08:00","level":"INFO","msg":"filestream: request sent","status":"200 OK"}
+{"time":"2026-03-27T10:17:03.059242498+08:00","level":"INFO","msg":"handler: closed"}
+{"time":"2026-03-27T10:17:03.0592934+08:00","level":"INFO","msg":"sender: closed"}
+{"time":"2026-03-27T10:17:03.05930059+08:00","level":"INFO","msg":"stream: closed"}

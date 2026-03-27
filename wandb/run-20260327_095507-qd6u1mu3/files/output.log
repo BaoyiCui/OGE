@@ -1,0 +1,38 @@
+Starting PPO training on OGE (red_sat)
+  0%|                                                                                                                                                                                      | 0/1000000 [00:00<?, ?it/s]
+/home/baoyicui/Workspaces/OGE/modules/env_wrapper.py:52: UserWarning: Creating a tensor from a list of numpy.ndarrays is extremely slow. Please consider converting the list to a single numpy.ndarray with numpy.array() before converting to a tensor. (Triggered internally at /pytorch/torch/csrc/utils/tensor_new.cpp:253.)
+  rew_t = torch.tensor([[rew_np]], dtype=torch.float32).to(self.device)
+Traceback (most recent call last):
+  File "/home/baoyicui/Workspaces/OGE/scripts/train.py", line 70, in <module>
+    main()
+    ~~~~^^
+  File "/home/baoyicui/Workspaces/OGE/scripts/train.py", line 66, in main
+    trainer.train()
+    ~~~~~~~~~~~~~^^
+  File "/home/baoyicui/Workspaces/OGE/third_party/skrl-1.4.3/skrl/trainers/torch/sequential.py", line 86, in train
+    self.single_agent_train()
+    ~~~~~~~~~~~~~~~~~~~~~~~^^
+  File "/home/baoyicui/Workspaces/OGE/third_party/skrl-1.4.3/skrl/trainers/torch/base.py", line 203, in single_agent_train
+    self.agents.record_transition(
+    ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~^
+        states=states,
+        ^^^^^^^^^^^^^^
+    ...<7 lines>...
+        timesteps=self.timesteps,
+        ^^^^^^^^^^^^^^^^^^^^^^^^^
+    )
+    ^
+  File "/home/baoyicui/Workspaces/OGE/third_party/skrl-1.4.3/skrl/agents/torch/ppo/ppo.py", line 302, in record_transition
+    self.memory.add_samples(
+    ~~~~~~~~~~~~~~~~~~~~~~~^
+        states=states,
+        ^^^^^^^^^^^^^^
+    ...<6 lines>...
+        values=values,
+        ^^^^^^^^^^^^^^
+    )
+    ^
+  File "/home/baoyicui/Workspaces/OGE/third_party/skrl-1.4.3/skrl/memories/torch/base.py", line 238, in add_samples
+    self.tensors[name][self.memory_index].copy_(tensor)
+    ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~^^^^^^^^
+RuntimeError: output with shape [1, 9] doesn't match the broadcast shape [1, 2, 9]

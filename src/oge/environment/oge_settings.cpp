@@ -17,10 +17,14 @@ namespace oge
     {
         // int defaults
         intSettings["random_seed"] = 42;
-        intSettings["num_pursuers"] = 1;
-        intSettings["num_evaders"] = 1;
+        intSettings["year"] = 2027;
+        intSettings["month"] = 9;
+        intSettings["day"] = 1;
+        intSettings["hour"] = 16;
+        intSettings["minute"] = 0;
 
         // float defaults
+        floatSettings["second"] = 0.0f;
         floatSettings["sma_base"] = 42164.0f;
         floatSettings["ecc_base"] = 0.0f;
         floatSettings["incl_base"] = 0.0f;
@@ -28,10 +32,10 @@ namespace oge
         floatSettings["w_base"] = 0.0f;
         floatSettings["TA_base"] = 0.0f;
 
-        floatSettings["dv_init_p"] = 0.2f;
-        floatSettings["dv_init_e"] = 0.2f;
-        floatSettings["dv_max_per_step_p"] = 0.01f;
-        floatSettings["dv_max_per_step_e"] = 0.01f;
+        floatSettings["dv_init_red"] = 0.2f;
+        floatSettings["dv_init_blue"] = 0.2f;
+        floatSettings["dv_max_per_step_red"] = 0.01f;
+        floatSettings["dv_max_per_step_blue"] = 0.01f;
         floatSettings["capture_distance"] = 5.0f;
         floatSettings["timestep"] = 10.0f;
         floatSettings["terminal_time"] = 3600.0f;
@@ -60,8 +64,12 @@ namespace oge
 
         // register as internal defaults
         setInternal("random_seed", toString(intSettings["random_seed"]), -1, true);
-        setInternal("num_pursuers", toString(intSettings["num_pursuers"]), -1, true);
-        setInternal("num_evaders", toString(intSettings["num_evaders"]), -1, true);
+        setInternal("year", toString(intSettings["year"]), -1, true);
+        setInternal("month", toString(intSettings["month"]), -1, true);
+        setInternal("day", toString(intSettings["day"]), -1, true);
+        setInternal("hour", toString(intSettings["hour"]), -1, true);
+        setInternal("minute", toString(intSettings["minute"]), -1, true);
+        setInternal("second", toString(floatSettings["second"]), -1, true);
 
         setInternal("sma_base", toString(floatSettings["sma_base"]), -1, true);
         setInternal("ecc_base", toString(floatSettings["ecc_base"]), -1, true);
@@ -70,10 +78,10 @@ namespace oge
         setInternal("w_base", toString(floatSettings["w_base"]), -1, true);
         setInternal("TA_base", toString(floatSettings["TA_base"]), -1, true);
 
-        setInternal("dv_init_p", toString(floatSettings["dv_init_p"]), -1, true);
-        setInternal("dv_init_e", toString(floatSettings["dv_init_e"]), -1, true);
-        setInternal("dv_max_per_step_p", toString(floatSettings["dv_max_per_step_p"]), -1, true);
-        setInternal("dv_max_per_step_e", toString(floatSettings["dv_max_per_step_e"]), -1, true);
+        setInternal("dv_init_red", toString(floatSettings["dv_init_red"]), -1, true);
+        setInternal("dv_init_blue", toString(floatSettings["dv_init_blue"]), -1, true);
+        setInternal("dv_max_per_step_red", toString(floatSettings["dv_max_per_step_red"]), -1, true);
+        setInternal("dv_max_per_step_blue", toString(floatSettings["dv_max_per_step_blue"]), -1, true);
         setInternal("capture_distance", toString(floatSettings["capture_distance"]), -1, true);
         setInternal("timestep", toString(floatSettings["timestep"]), -1, true);
         setInternal("terminal_time", toString(floatSettings["terminal_time"]), -1, true);
@@ -109,10 +117,7 @@ namespace oge
 
     void OGESettings::validate() const
     {
-        if (getInt("num_evaders") != 1)
-            throw std::invalid_argument("OGESettings: num_evaders must be 1");
-        if (getInt("num_pursuers") <= 0)
-            throw std::invalid_argument("OGESettings: num_pursuers must be > 0");
+        // TODO: 检查初始UTC相关设置
 
         const float sma_base = getFloat("sma_base");
         if (sma_base <= 0.0)
@@ -133,14 +138,14 @@ namespace oge
         if (TA_base < 0.0 || TA_base > 2.0 * M_PI)
             throw std::invalid_argument("OGESettings: TA_base must be in [0, 2*pi] rad");
 
-        if (getFloat("dv_init_p") <= 0.0)
-            throw std::invalid_argument("OGESettings: dv_init_p must be > 0");
-        if (getFloat("dv_init_e") <= 0.0)
-            throw std::invalid_argument("OGESettings: dv_init_e must be > 0");
-        if (getFloat("dv_max_per_step_p") <= 0.0)
-            throw std::invalid_argument("OGESettings: dv_max_per_step_p must be > 0");
-        if (getFloat("dv_max_per_step_e") <= 0.0)
-            throw std::invalid_argument("OGESettings: dv_max_per_step_e must be > 0");
+        if (getFloat("dv_init_red") <= 0.0)
+            throw std::invalid_argument("OGESettings: dv_init_red must be > 0");
+        if (getFloat("dv_init_blue") <= 0.0)
+            throw std::invalid_argument("OGESettings: dv_init_blue must be > 0");
+        if (getFloat("dv_max_per_step_red") <= 0.0)
+            throw std::invalid_argument("OGESettings: dv_max_per_step_red must be > 0");
+        if (getFloat("dv_max_per_step_blue") <= 0.0)
+            throw std::invalid_argument("OGESettings: dv_max_per_step_blue must be > 0");
         if (getFloat("capture_distance") <= 0.0)
             throw std::invalid_argument("OGESettings: capture_distance must be > 0");
         const float timestep = getFloat("timestep");
@@ -180,7 +185,6 @@ namespace oge
             throw std::invalid_argument("OGESettings: reward_fuelout_weight (penalty) must be <= 0");
         if (getFloat("reward_phase_dist_weight") < 0.0)
             throw std::invalid_argument("OGESettings: reward_phase_dist_weight must be >= 0");
-
     }
 
     void OGESettings::copyTo(OGESettings& dst) const

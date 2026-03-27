@@ -14,14 +14,11 @@ namespace oge
     ) :
         settings(settings_),
         random_seed(settings_.getInt("random_seed", true)),
-        num_pursuers(settings_.getInt("num_pursuers", true)),
-        num_evaders(settings_.getInt("num_evaders", true)),
-        num_agents(num_evaders + num_pursuers),
         // simulation settings
-        dv_init_p(settings_.getFloat("dv_init_p")),
-        dv_init_e(settings_.getFloat("dv_init_e")),
-        dv_max_per_step_p(settings_.getFloat("dv_max_per_step_p")),
-        dv_max_per_step_e(settings_.getFloat("dv_max_per_step_e")),
+        dv_init_red(settings_.getFloat("dv_init_red")),
+        dv_init_blue(settings_.getFloat("dv_init_blue")),
+        dv_max_per_step_red(settings_.getFloat("dv_max_per_step_red")),
+        dv_max_per_step_blue(settings_.getFloat("dv_max_per_step_blue")),
         capture_distance(settings_.getFloat("capture_distance")),
         timestep(settings_.getFloat("timestep")),
         terminal_time(settings_.getFloat("terminal_time")),
@@ -65,38 +62,22 @@ namespace oge
         );
         TA_lead_distrib = std::uniform_int_distribution<int>(0, 1);
 
-        // initialize agent
-        agent_ids.reserve(num_agents);
+        // initialize agents: agents_states[0] = blue_sat, agents_states[1] = red_sat
+        agent_ids = {"blue_sat", "red_sat"};
         agents_states.resize(num_agents);
 
-        for (int i = 0; i < num_evaders; ++i)
-        {
-            agent_ids.push_back("e_" + std::to_string(i));
-        }
-        for (int i = 0; i < num_pursuers; ++i)
-        {
-            agent_ids.push_back("p_" + std::to_string(i));
-        }
         current_time = 0.0;
+
         reset();
     }
 
     bool OrbitalGameEnvironment::isTerminal() const
     {
-        const bool all_captured = std::all_of(
-            agents_states.begin(),
-            agents_states.begin() + num_evaders,
-            [](const SatState& s) { return !s.is_alive; }
-        );
-        if (all_captured) return true;
+        // blue_sat captured
+        if (!agents_states[0].is_alive) return true;
 
-        const bool fuel_exceeded = std::all_of(
-            agents_states.begin() + num_evaders,
-            agents_states.end(),
-            [](const SatState& s) { return !s.is_alive; }
-        );
-
-        if (fuel_exceeded) return true;
+        // red_sat fuel exhausted
+        if (!agents_states[1].is_alive) return true;
 
         return false;
     }
@@ -108,15 +89,10 @@ namespace oge
 
     int OrbitalGameEnvironment::getObsSize(int agent_idx) const
     {
-        // For pursuer
-        //      The first 6 elements are RV in J2000 frame.
-        //      The last 3 elements are target position in this pursuer's LVLH frame.
-        //      The remaining elements are other pursuers' positions in this pursuer's LVLH frame.
-        // For evader
-        //      The first 6 elements are RV in J2000 frame.
-        //      The other elements are pursuers' positions in this evader's LVLH frame.
-        // This observation's structure only supports OGE with a single evader.
-        return 3 * (num_agents + 1);
+        // For both agents the observation is:
+        //   [own R(3), own V(3), other's position in own LVLH frame(3), sun_direction_lvlh(3)]
+        // = 12
+        return 12;
     }
 
     double OrbitalGameEnvironment::getCurrentTime() const
@@ -124,65 +100,67 @@ namespace oge
         return current_time;
     }
 
+    std::chrono::sys_time<std::chrono::milliseconds>& OrbitalGameEnvironment::getCurrentUTC() const
+    {
+        // TODO: 完成这个函数
+        return std::chrono::milliseconds
+    }
+
     void OrbitalGameEnvironment::getObservations(std::vector<Eigen::VectorXd>& observations) const
     {
+        // 每个agent的observation构成如下 以下编号都是左闭右开
+        // [0:6] 自身在J2000坐标下的RV
+        // [6:9] 目标在LVLH坐标下的R
+        // [9:12] LVLH坐标下指向太阳的单位矢量
+
         observations.resize(num_agents);
-        for (int e = 0; e < num_evaders; ++e)
+
+        // 计算当前时刻的儒略日
+        auto current_utc = start_time_utc + std::chrono::seconds(static_cast<long>(current_time));
+        double jd = JulianDay(std::chrono::time_point_cast<std::chrono::seconds>(current_utc));
+
+        // 计算太阳位置
+        Eigen::Vector3d sun_pos_j2000;
+        solar_position(jd, sun_pos_j2000);
+
+        // blue_sat (index 0): own RV + red_sat position in blue_sat's LVLH frame + sun angle
         {
-            observations[e].resize(getObsSize(e));
-            // observations[e].segment<3>(0) = signed_log(agents_states[e].r_j2000);
-            // observations[e].segment<3>(3) = signed_log(agents_states[e].v_j2000);
-            observations[e].segment<3>(0) = (agents_states[e].r_j2000);
-            observations[e].segment<3>(3) = (agents_states[e].v_j2000);
-            for (int p = num_evaders; p < num_agents; ++p)
-            {
-                Eigen::Vector3d r_p_lvlh;
-                Eigen::Vector3d v_p_lvlh;
-                RV_J20002LVLH(
-                    agents_states[e].r_j2000, agents_states[e].v_j2000,
-                    agents_states[p].r_j2000, agents_states[p].v_j2000,
-                    r_p_lvlh, v_p_lvlh
-                );
-                // observations[e].segment<3>(6 + 3 * (p - num_evaders)) = signed_log(r_p_lvlh);
-                observations[e].segment<3>(6 + 3 * (p - num_evaders)) = (r_p_lvlh);
-            }
+            observations[0].resize(getObsSize(0));
+            observations[0].segment<3>(0) = agents_states[0].r_j2000;
+            observations[0].segment<3>(3) = agents_states[0].v_j2000;
+            Eigen::Vector3d r_red_lvlh, v_red_lvlh;
+            RV_J20002LVLH(
+                agents_states[0].r_j2000, agents_states[0].v_j2000,
+                agents_states[1].r_j2000, agents_states[1].v_j2000,
+                r_red_lvlh, v_red_lvlh
+            );
+            observations[0].segment<3>(6) = r_red_lvlh;
+
+            // 计算光照角（卫星到太阳的夹角）
+            Eigen::Vector3d sat_to_sun = sun_pos_j2000 - agents_states[0].r_j2000;
+            double cos_angle = agents_states[0].r_j2000.dot(sat_to_sun) /
+                (agents_states[0].r_j2000.norm() * sat_to_sun.norm());
+            observations[0](9) = std::acos(std::clamp(cos_angle, -1.0, 1.0));
         }
 
-        for (int p = num_evaders; p < num_agents; ++p)
+        // red_sat (index 1): own RV + blue_sat (target) position in red_sat's LVLH frame + sun angle
         {
-            observations[p].resize(getObsSize(p));
-            // observations[p].segment<3>(0) = signed_log(agents_states[p].r_j2000);
-            // observations[p].segment<3>(3) = signed_log(agents_states[p].v_j2000);
-            observations[p].segment<3>(0) = (agents_states[p].r_j2000);
-            observations[p].segment<3>(3) = (agents_states[p].v_j2000);
-
-            // other pursuers' positions in this pursuer's LVLH frame
-            int offset = 6;
-            for (int other_p = num_evaders; other_p < num_agents; ++other_p)
-            {
-                if (other_p == p)
-                    continue;
-
-                Eigen::Vector3d r_other_p_lvlh, v_other_p_lvlh;
-                RV_J20002LVLH(
-                    agents_states[p].r_j2000, agents_states[p].v_j2000,
-                    agents_states[other_p].r_j2000, agents_states[other_p].v_j2000,
-                    r_other_p_lvlh, v_other_p_lvlh
-                );
-                // observations[p].segment<3>(offset) = signed_log(r_other_p_lvlh);
-                observations[p].segment<3>(offset) = (r_other_p_lvlh);
-                offset += 3;
-            }
-
-            // evader (target) position in this pursuer's LVLH frame — last 3 elements
-            Eigen::Vector3d r_e_lvlh, v_e_lvlh;
+            observations[1].resize(getObsSize(1));
+            observations[1].segment<3>(0) = agents_states[1].r_j2000;
+            observations[1].segment<3>(3) = agents_states[1].v_j2000;
+            Eigen::Vector3d r_blue_lvlh, v_blue_lvlh;
             RV_J20002LVLH(
-                agents_states[p].r_j2000, agents_states[p].v_j2000,
+                agents_states[1].r_j2000, agents_states[1].v_j2000,
                 agents_states[0].r_j2000, agents_states[0].v_j2000,
-                r_e_lvlh, v_e_lvlh
+                r_blue_lvlh, v_blue_lvlh
             );
-            // observations[p].segment<3>(getObsSize(p) - 3) = signed_log(r_e_lvlh);
-            observations[p].segment<3>(getObsSize(p) - 3) = (r_e_lvlh);
+            observations[1].segment<3>(6) = r_blue_lvlh;
+
+            // TODO： 检查光照角计算对不对
+            Eigen::Vector3d sat_to_sun = sun_pos_j2000 - agents_states[1].r_j2000;
+            double cos_angle = agents_states[1].r_j2000.dot(sat_to_sun) /
+                (agents_states[1].r_j2000.norm() * sat_to_sun.norm());
+            observations[1](9) = std::acos(std::clamp(cos_angle, -1.0, 1.0));
         }
     }
 
@@ -190,24 +168,22 @@ namespace oge
                                             std::vector<double>& rewards) const
     {
         rewards.assign(num_agents, 0.0);
-        // TODO: evader's reward
-
-        for (int p = num_evaders; p < num_agents; ++p)
-        {
-            rewards[p] += getFormationReward();
-            // rewards[p] += getDistanceReward(p);     // TODO: 这一项奖励函数先改简单一点，直接用距离当奖励函数好了
-            rewards[p] += getDistanceRewardNew(p);
-            rewards[p] += getCaptureReward(p);
-            rewards[p] += getFuelReward(p, agent_actions[p]);
-            rewards[p] += getTimeReward();
-        }
+        // blue_sat reward is always 0
+        // red_sat reward (index 1)
+        rewards[1] += getFormationReward();
+        rewards[1] += getDistanceRewardNew(1);
+        rewards[1] += getCaptureReward(1);
+        rewards[1] += getFuelReward(1, agent_actions[1]);
+        rewards[1] += getTimeReward();
     }
 
 
     void OrbitalGameEnvironment::reset()
     {
         current_time = 0.0;
-        // initialize evader's state
+        // TODO: 这里从settings读取year month day hour minite second，然后初始化start_time_utc
+
+        // initialize blue_sat's state
         const Eigen::Matrix<double, 6, 1> coe_base(
             settings.getFloat("sma_base", true),
             settings.getFloat("ecc_base", true),
@@ -215,35 +191,26 @@ namespace oge
             settings.getFloat("RA_base", true),
             settings.getFloat("w_base", true),
             settings.getFloat("TA_base", true));
-        Eigen::Matrix<double, 6, 1> coe_e = coe_base;
-        coe_e[0] += sma_perturb_distrib(_rng);
-        coe_e[5] = true_anomaly_distrib(_rng);
-        coe2rv(coe_e, agents_states[0].r_j2000, agents_states[0].v_j2000);
+        Eigen::Matrix<double, 6, 1> coe_blue = coe_base;
+        coe_blue[0] += sma_perturb_distrib(_rng);
+        coe_blue[5] = true_anomaly_distrib(_rng);
+        coe2rv(coe_blue, agents_states[0].r_j2000, agents_states[0].v_j2000);
 
-        // initialize pursuer's state
-        for (int p = num_evaders; p < num_agents; ++p)
+        // initialize red_sat's state
         {
-            Eigen::Matrix<double, 6, 1> coe_p = coe_base;
+            Eigen::Matrix<double, 6, 1> coe_red = coe_base;
             double TA_lead = TA_lead_distrib(_rng) == 0 ? -1.0 : 1.0; // 相位超前还是滞后
             double distance_offset = dist_init_offset_distrib(_rng);
-            coe_p[0] += sma_perturb_distrib(_rng);
-            coe_p[5] = coe_e[5] + TA_lead * distance_offset / coe_p[0]; // 基于evader的TA加偏移
-            coe2rv(coe_p, agents_states[p].r_j2000, agents_states[p].v_j2000);
+            coe_red[0] += sma_perturb_distrib(_rng);
+            coe_red[5] = coe_blue[5] + TA_lead * distance_offset / coe_red[0]; // 基于blue_sat的TA加偏移
+            coe2rv(coe_red, agents_states[1].r_j2000, agents_states[1].v_j2000);
         }
 
         // make every agent alive and reset fuel
-        for (int i = 0; i < num_agents; ++i)
-        {
-            agents_states[i].is_alive = true;
-            if (i < num_evaders)
-            {
-                agents_states[i].dv_remain = dv_init_e;
-            }
-            else
-            {
-                agents_states[i].dv_remain = dv_init_p;
-            }
-        }
+        agents_states[0].is_alive = true;
+        agents_states[0].dv_remain = dv_init_blue;
+        agents_states[1].is_alive = true;
+        agents_states[1].dv_remain = dv_init_red;
     }
 
     std::unordered_map<std::string, SatState> OrbitalGameEnvironment::getSatStates() const
@@ -259,6 +226,7 @@ namespace oge
     void OrbitalGameEnvironment::resetWithStates(const std::unordered_map<std::string, SatState>& states)
     {
         current_time = 0.0;
+        // TODO: 这里按照settings的初始时间设置
         for (int i = 0; i < num_agents; ++i)
         {
             auto it = states.find(agent_ids[i]);
@@ -282,7 +250,8 @@ namespace oge
             Eigen::Vector3d dv_modified = Eigen::Vector3d::Zero();
             if (agents_states[i].dv_remain > 0.0 && !almost_equal(actions[i].norm(), 0.0))
             {
-                double dv_max_per_step = (i < num_evaders) ? dv_max_per_step_e : dv_max_per_step_p;
+                // index 0 = blue_sat, index 1 = red_sat
+                double dv_max_per_step = (i == 0) ? dv_max_per_step_blue : dv_max_per_step_red;
                 if (actions[i].norm() > std::min(dv_max_per_step, agents_states[i].dv_remain))
                 {
                     dv_modified = std::min(dv_max_per_step, agents_states[i].dv_remain) * actions[i].normalized();
@@ -316,74 +285,42 @@ namespace oge
 
     void OrbitalGameEnvironment::checkAlive()
     {
-        for (int e = 0; e < num_evaders; ++e)
+        // check if blue_sat is captured by red_sat
+        if ((agents_states[0].r_j2000 - agents_states[1].r_j2000).norm() < capture_distance)
         {
-            for (int p = num_evaders; p < num_agents; ++p)
-            {
-                if ((agents_states[e].r_j2000 - agents_states[p].r_j2000).norm() < capture_distance)
-                {
-                    agents_states[e].is_alive = false;
-                    break;
-                }
-            }
+            agents_states[0].is_alive = false;
         }
-        for (int p = num_evaders; p < num_agents; ++p)
+
+        // 检查red_sat的燃料是否耗尽
+        if (almost_equal(agents_states[1].dv_remain, 0.0))
         {
-            // 检查pursuers的燃料是否耗尽
-            if (almost_equal(agents_states[p].dv_remain, 0.0))
-            {
-                agents_states[p].is_alive = false;
-            }
+            agents_states[1].is_alive = false;
         }
     }
 
     double OrbitalGameEnvironment::getFormationReward() const
     {
-        // Formation reward only makes sense when there are multiple pursuers.
-        if (num_pursuers < 2)
-            return 0.0;
-
-        // Accumulate the unit direction vectors from the evader (index 0) to each pursuer.
-        // If pursuers surround the evader uniformly, their unit vectors cancel out and
-        // sum_directions approaches zero — which is the ideal formation.
-        Eigen::Vector3d sum_directions = Eigen::Vector3d::Zero();
-        for (int p = num_evaders; p < num_agents; ++p)
-        {
-            double r_diff_j2000_norm = (agents_states[p].r_j2000 - agents_states[0].r_j2000).norm();
-            // Skip pursuers that coincide with the evader to avoid division by zero.
-            if (almost_equal(r_diff_j2000_norm, 0.0))
-                continue;
-            sum_directions += (agents_states[p].r_j2000 - agents_states[0].r_j2000) / r_diff_j2000_norm;
-        }
-
-        // reward = weight / (1 + ||sum_directions||)
-        // The norm of sum_directions is 0 for perfect encirclement and up to num_pursuers
-        // when all pursuers are on the same side. Dividing 1 by (1 + norm) maps this to (0, 1].
-        const double reward_formation = reward_formation_weight * (1.0 / (1.0 + sum_directions.norm()));
-
-        return reward_formation;
+        // Formation reward only makes sense when there are multiple red_sats.
+        // With a single red_sat, this reward is always 0.
+        return 0.0;
     }
 
-    double OrbitalGameEnvironment::getDistanceRewardNew(int p) const
+    double OrbitalGameEnvironment::getDistanceRewardNew(int red_idx) const
     {
-        // TODO: 这个函数唯一可调节参数是 reward_phase_dist_weight
-        const double distance = (agents_states[p].r_j2000 - agents_states[0].r_j2000).norm();
-        // return -reward_phase_dist_weight * std::exp(distance / capture_distance);
-        // return -reward_phase_dist_weight * (1 - std::exp(-distance / capture_distance));
+        const double distance = (agents_states[red_idx].r_j2000 - agents_states[0].r_j2000).norm();
         return -reward_phase_dist_weight * (distance - capture_distance) / capture_distance;
     }
 
-    double OrbitalGameEnvironment::getDistanceReward(int p) const
+    double OrbitalGameEnvironment::getDistanceReward(int red_idx) const
     {
-        // TODO: 这个函数是直接从任欣的代码里改的，但是参数太多了调不明白
-        double distance = (agents_states[p].r_j2000 - agents_states[0].r_j2000).norm();
+        double distance = (agents_states[red_idx].r_j2000 - agents_states[0].r_j2000).norm();
 
-        Eigen::Matrix<double, 6, 1> coe_p, coe_e;
-        rv2coe(agents_states[p].r_j2000, agents_states[p].v_j2000, coe_p);
-        rv2coe(agents_states[0].r_j2000, agents_states[0].v_j2000, coe_e);
+        Eigen::Matrix<double, 6, 1> coe_red, coe_blue;
+        rv2coe(agents_states[red_idx].r_j2000, agents_states[red_idx].v_j2000, coe_red);
+        rv2coe(agents_states[0].r_j2000, agents_states[0].v_j2000, coe_blue);
 
-        double TA_delta = std::fmod((coe_p - coe_e)(5) + M_PI, 2.0 * M_PI) - M_PI;
-        double sma_diff_ratio = (coe_p - coe_e)(0) / coe_e(0);
+        double TA_delta = std::fmod((coe_red - coe_blue)(5) + M_PI, 2.0 * M_PI) - M_PI;
+        double sma_diff_ratio = (coe_red - coe_blue)(0) / coe_blue(0);
 
         // Far field
         double drift_product = TA_delta * sma_diff_ratio;
@@ -424,42 +361,20 @@ namespace oge
         return reward_phase_dist_weight * total_reward;
     }
 
-    double OrbitalGameEnvironment::getCaptureReward(int p) const
+    double OrbitalGameEnvironment::getCaptureReward(int red_idx) const
     {
-        bool captured_team = false;
-        for (int i = num_evaders; i < num_agents; ++i)
+        if ((agents_states[red_idx].r_j2000 - agents_states[0].r_j2000).norm() < capture_distance)
         {
-            if ((agents_states[i].r_j2000 - agents_states[0].r_j2000).norm() < capture_distance)
-            {
-                captured_team = true;
-                break;
-            }
-        }
-
-        if (captured_team)
-        {
-            if ((agents_states[p].r_j2000 - agents_states[0].r_j2000).norm() < capture_distance)
-            {
-                return reward_capture_weight; // capture bonus
-            }
-
-            return 0.5 * reward_capture_weight; // assistant capture bonus
+            return reward_capture_weight; // capture bonus
         }
 
         return 0.0; // no capture
     }
 
-    double OrbitalGameEnvironment::getFuelReward(const int p, const Eigen::Vector3d& action) const
+    double OrbitalGameEnvironment::getFuelReward(const int red_idx, const Eigen::Vector3d& action) const
     {
         double fuel_used = action.norm();
-        // if (fuel_used > agents_states[p].dv_remain)
-        // {
-        //     if (fuel_used > dv_max_per_step_p)
-        //     {
-        //         fuel_used = dv_max_per_step_p;
-        //     }
-        // }
-        fuel_used = std::min(std::min(fuel_used, agents_states[p].dv_remain), dv_max_per_step_p);
+        fuel_used = std::min(std::min(fuel_used, agents_states[red_idx].dv_remain), dv_max_per_step_red);
 
         return reward_fuel_weight * fuel_used;
     }
@@ -471,12 +386,7 @@ namespace oge
 
     bool OrbitalGameEnvironment::isCaptured() const
     {
-        for (int e = 0; e < num_evaders; ++e)
-        {
-            if (!agents_states[e].is_alive)
-                return true;
-        }
-        return false;
+        return !agents_states[0].is_alive;
     }
 
     void OrbitalGameEnvironment::act(const std::vector<Eigen::Vector3d>& agents_actions)
