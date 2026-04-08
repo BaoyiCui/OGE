@@ -126,16 +126,16 @@ namespace oge
         if (ecc_base < 0.0 || ecc_base >= 1.0)
             throw std::invalid_argument("OGESettings: ecc_base must be in [0, 1)");
         const float incl_base = getFloat("incl_base");
-        if (incl_base < 0.0 || incl_base > M_PI)
+        if (incl_base < 0.0 || incl_base > std::numbers::pi)
             throw std::invalid_argument("OGESettings: incl_base must be in [0, pi] rad");
         const float RA_base = getFloat("RA_base");
-        if (RA_base < 0.0 || RA_base > 2.0 * M_PI)
+        if (RA_base < 0.0 || RA_base > 2.0 * std::numbers::pi)
             throw std::invalid_argument("OGESettings: RA_base must be in [0, 2*pi] rad");
         const float w_base = getFloat("w_base");
-        if (w_base < 0.0 || w_base > 2.0 * M_PI)
+        if (w_base < 0.0 || w_base > 2.0 * std::numbers::pi)
             throw std::invalid_argument("OGESettings: w_base must be in [0, 2*pi] rad");
         const float TA_base = getFloat("TA_base");
-        if (TA_base < 0.0 || TA_base > 2.0 * M_PI)
+        if (TA_base < 0.0 || TA_base > 2.0 * std::numbers::pi)
             throw std::invalid_argument("OGESettings: TA_base must be in [0, 2*pi] rad");
 
         if (getFloat("dv_init_red") <= 0.0)

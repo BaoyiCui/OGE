@@ -9,7 +9,7 @@ double oge::kepler_E(const double e, const double M, const double error)
 {
     double E;
 
-    if (M < M_PI)
+    if (M < std::numbers::pi)
     {
         E = M + e * 0.5;
     }

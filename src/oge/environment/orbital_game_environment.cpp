@@ -54,7 +54,7 @@ namespace oge
         );
         true_anomaly_distrib = std::uniform_real_distribution<double>(
             0.0,
-            2 * M_PI
+            2 * std::numbers::pi
         );
         dist_init_offset_distrib = std::uniform_real_distribution<double>(
             capture_distance + dist_init_offset_min,
@@ -319,7 +319,7 @@ namespace oge
         rv2coe(agents_states[red_idx].r_j2000, agents_states[red_idx].v_j2000, coe_red);
         rv2coe(agents_states[0].r_j2000, agents_states[0].v_j2000, coe_blue);
 
-        double TA_delta = std::fmod((coe_red - coe_blue)(5) + M_PI, 2.0 * M_PI) - M_PI;
+        double TA_delta = std::fmod((coe_red - coe_blue)(5) + std::numbers::pi, 2.0 * std::numbers::pi) - std::numbers::pi;
         double sma_diff_ratio = (coe_red - coe_blue)(0) / coe_blue(0);
 
         // Far field
@@ -332,7 +332,7 @@ namespace oge
         else
         {
             double r_drift = std::clamp(std::abs(sma_diff_ratio) * reward_far_drift_scale, 0.0, reward_far_drift_max);
-            double r_angle = (M_PI - std::abs(TA_delta)) / M_PI;
+            double r_angle = (std::numbers::pi - std::abs(TA_delta)) / std::numbers::pi;
             reward_far = 1.0 * r_drift + reward_far_angle_weight * r_angle;
         }
 

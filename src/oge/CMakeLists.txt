@@ -8,8 +8,12 @@ set(CMAKE_INTERPROCEDURAL_OPTIMIZATION TRUE)
 set(CMAKE_POSITION_INDEPENDENT_CODE TRUE)
 
 # Compiler options
+if (MSVC)
+    add_compile_options("$<$<CONFIG:RELEASE>:/O2>")
+else ()
+    add_compile_options("$<$<CONFIG:RELEASE>:-O3>")
+endif ()
 add_compile_options(
-        "$<$<CONFIG:RELEASE>:-O3>"
         "$<$<CONFIG:DEBUG>:-O0>"
         "$<$<CXX_COMPILER_ID:GNU,Clang,AppleClang>:-Wall>"
         "$<$<CXX_COMPILER_ID:MSVC>:/W4>"

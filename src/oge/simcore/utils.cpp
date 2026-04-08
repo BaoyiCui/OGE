@@ -115,7 +115,7 @@ namespace oge
             RA = std::acos(std::clamp(N(0) / n, -1.0, 1.0));
             if (N(1) < 0)
             {
-                RA = 2.0 * M_PI - RA;
+                RA = 2.0 * std::numbers::pi - RA;
             }
         }
         else
@@ -134,7 +134,7 @@ namespace oge
                 w = std::acos(std::clamp(N.dot(E) / n / e, -1.0, 1.0));
                 if (E(2) < 0)
                 {
-                    w = 2 * M_PI - w;
+                    w = 2 * std::numbers::pi - w;
                 }
             }
             else
@@ -153,7 +153,7 @@ namespace oge
             TA = std::acos(std::clamp(E.dot(R) / e / r, -1.0, 1.0));
             if (vr < 0)
             {
-                TA = 2 * M_PI - TA;
+                TA = 2 * std::numbers::pi - TA;
             }
         }
         else
@@ -168,14 +168,14 @@ namespace oge
                 }
                 else
                 {
-                    TA = 2 * M_PI - std::acos(std::clamp(N.dot(R) / n / r, -1.0, 1.0));
+                    TA = 2 * std::numbers::pi - std::acos(std::clamp(N.dot(R) / n / r, -1.0, 1.0));
                 }
             }
             else
             {
                 // Circular equatorial orbit: use true longitude (angle of R from x-axis)
                 TA = std::atan2(R(1), R(0));
-                if (TA < 0.0) TA += 2.0 * M_PI;
+                if (TA < 0.0) TA += 2.0 * std::numbers::pi;
             }
         }
         double a = h * h / MU / (1 - e * e);
@@ -291,7 +291,7 @@ namespace oge
         double M = 357.52911 + 35999.05029 * T - 0.0001537 * T * T;
         M = fmod(M, 360.0);
         if (M < 0) M += 360.0;
-        double M_rad = M * M_PI / 180.0;
+        double M_rad = M * std::numbers::pi / 180.0;
 
         // Eccentricity of Earth's orbit
         double e = 0.016708634 - 0.000042037 * T - 0.0000001267 * T * T;
@@ -305,17 +305,17 @@ namespace oge
         double sun_lon = L0 + C;
 
         // Sun's true anomaly (radians)
-        double v_rad = (M + C) * M_PI / 180.0;
+        double v_rad = (M + C) * std::numbers::pi / 180.0;
 
         // Sun-Earth distance (km)
         double R_km = AU * 1.000001018 * (1.0 - e * e) / (1.0 + e * cos(v_rad));
 
         // Obliquity of the ecliptic (degrees)
         double epsilon = 23.439291 - 0.0130042 * T - 1.64e-7 * T * T + 5.04e-7 * T * T * T;
-        double epsilon_rad = epsilon * M_PI / 180.0;
+        double epsilon_rad = epsilon * std::numbers::pi / 180.0;
 
         // Sun's ecliptic longitude (radians)
-        double lambda_rad = sun_lon * M_PI / 180.0;
+        double lambda_rad = sun_lon * std::numbers::pi / 180.0;
 
         // Convert from ecliptic to J2000 equatorial coordinates
         pos_sun_j2000(0) = R_km * cos(lambda_rad);
