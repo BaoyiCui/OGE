@@ -100,11 +100,11 @@ namespace oge
         return current_time;
     }
 
-    std::chrono::sys_time<std::chrono::milliseconds>& OrbitalGameEnvironment::getCurrentUTC() const
-    {
-        // TODO: 完成这个函数
-        return std::chrono::milliseconds
-    }
+    // std::chrono::sys_time<std::chrono::milliseconds>& OrbitalGameEnvironment::getCurrentUTC() const
+    // {
+    //     // TODO: 完成这个函数
+    //     return std::chrono::milliseconds
+    // }
 
     void OrbitalGameEnvironment::getObservations(std::vector<Eigen::VectorXd>& observations) const
     {
