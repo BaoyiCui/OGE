@@ -23,25 +23,25 @@ jobs:
     steps:
       - uses: actions/checkout@v4
 
-      - name: Set up vcpkg (macOS)
-        if: runner.os == 'macOS'
-        run: |
-          git clone https://github.com/microsoft/vcpkg.git $HOME/vcpkg
-          $HOME/vcpkg/bootstrap-vcpkg.sh
-          echo "VCPKG_ROOT=$HOME/vcpkg" >> $GITHUB_ENV
-
-      - name: Set up vcpkg (Windows)
-        if: runner.os == 'Windows'
-        run: |
-          git clone https://github.com/microsoft/vcpkg.git C:/vcpkg
-          C:/vcpkg/bootstrap-vcpkg.bat
-          echo "VCPKG_ROOT=C:/vcpkg" >> $env:GITHUB_ENV
+#      - name: Set up vcpkg (macOS)
+#        if: runner.os == 'macOS'
+#        run: |
+#          git clone https://github.com/microsoft/vcpkg.git $HOME/vcpkg
+#          $HOME/vcpkg/bootstrap-vcpkg.sh
+#          echo "VCPKG_ROOT=$HOME/vcpkg" >> $GITHUB_ENV
+#
+#      - name: Set up vcpkg (Windows)
+#        if: runner.os == 'Windows'
+#        run: |
+#          git clone https://github.com/microsoft/vcpkg.git C:/vcpkg
+#          C:/vcpkg/bootstrap-vcpkg.bat
+#          echo "VCPKG_ROOT=C:/vcpkg" >> $env:GITHUB_ENV
 
       - uses: pypa/cibuildwheel@v2.22
-        env:
-          # Linux: vcpkg is installed inside the container via before-all in pyproject.toml
-          # macOS/Windows: vcpkg is installed above
-          VCPKG_ROOT: ${{ env.VCPKG_ROOT }}
+#        env:
+#          # Linux: vcpkg is installed inside the container via before-all in pyproject.toml
+#          # macOS/Windows: vcpkg is installed above
+#          VCPKG_ROOT: ${{ env.VCPKG_ROOT }}
 
       - uses: actions/upload-artifact@v4
         with:
