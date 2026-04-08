@@ -29,8 +29,6 @@ classifiers = [
     "Programming Language :: Python :: 3.13",
     "Programming Language :: C++",
     "Topic :: Scientific/Engineering",
-    "Topic :: Scientific/Engineering :: Artificial Intelligence",
-    "Topic :: Scientific/Engineering :: Aerospace"
 ]
 dependencies = [
     "numpy>=2.4.1",
