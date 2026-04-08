@@ -98,7 +98,7 @@ before-all = [
 [[tool.cibuildwheel.overrides]]
 # Install vcpkg inside Linux manylinux containers
 before-all = [
-    "apt install -y zip unzip tar curl",
+    "yum install -y zip unzip tar curl",
     "if [ ! -d \"$HOME/vcpkg\" ]; then git clone https://github.com/microsoft/vcpkg.git $HOME/vcpkg; fi",
     "$HOME/vcpkg/bootstrap-vcpkg.sh",
 ]
@@ -109,7 +109,7 @@ environment = { PIP_ONLY_BINARY = "numpy", VCPKG_ROOT = "$HOME/vcpkg", VCPKG_DEF
 [[tool.cibuildwheel.overrides]]
 # Install vcpkg inside Linux manylinux containers
 before-all = [
-    "apt install -y zip unzip tar curl",
+    "yum install -y zip unzip tar curl",
     "if [ ! -d \"$HOME/vcpkg\" ]; then git clone https://github.com/microsoft/vcpkg.git $HOME/vcpkg; fi",
     "$HOME/vcpkg/bootstrap-vcpkg.sh",
 ]
