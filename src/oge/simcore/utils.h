@@ -11,6 +11,7 @@
 #include <sstream>
 #include <stdexcept>
 #include <string>
+#include <numbers>
 
 
 #include "oge/common/constants.h"
