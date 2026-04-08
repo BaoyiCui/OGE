@@ -71,11 +71,6 @@ build-frontend = "build"
 manylinux-x86_64-image = "manylinux_2_28"
 manylinux-aarch64-image = "manylinux_2_28"
 
-# Install vcpkg inside Linux manylinux containers
-before-all = [
-    "if [ ! -d \"$HOME/vcpkg\" ]; then git clone https://github.com/microsoft/vcpkg.git $HOME/vcpkg; fi",
-    "$HOME/vcpkg/bootstrap-vcpkg.sh",
-]
 
 [tool.cibuildwheel.environment]
 PIP_ONLY_BINARY = "numpy"
@@ -93,7 +88,7 @@ before-all = [
 # Windows amd64
 [[tool.cibuildwheel.overrides]]
 select = "*-win_amd64"
-environment = { PIP_ONLY_BINARY = "numpy", VCPKG_ROOT = "%USERPROFILE%\\vcpkg", VCPKG_DEFAULT_TRIPLET = "x64-windows-mixed", VCPKG_FEATURE_FLAGS = "-compilertracking" }
+environment = { PIP_ONLY_BINARY = "numpy", VCPKG_ROOT = "$USERPROFILE/vcpkg", VCPKG_DEFAULT_TRIPLET = "x64-windows-mixed", VCPKG_FEATURE_FLAGS = "-compilertracking" }
 before-all = [
     "if not exist %USERPROFILE%\\vcpkg git clone https://github.com/microsoft/vcpkg.git %USERPROFILE%\\vcpkg",
     "%USERPROFILE%\\vcpkg\\bootstrap-vcpkg.bat",
@@ -101,10 +96,22 @@ before-all = [
 
 # Linux x86-64
 [[tool.cibuildwheel.overrides]]
+# Install vcpkg inside Linux manylinux containers
+before-all = [
+    "apt install -y zip unzip tar curl",
+    "if [ ! -d \"$HOME/vcpkg\" ]; then git clone https://github.com/microsoft/vcpkg.git $HOME/vcpkg; fi",
+    "$HOME/vcpkg/bootstrap-vcpkg.sh",
+]
 select = "*-manylinux_x86_64"
 environment = { PIP_ONLY_BINARY = "numpy", VCPKG_ROOT = "$HOME/vcpkg", VCPKG_DEFAULT_TRIPLET = "x64-linux-mixed", VCPKG_FEATURE_FLAGS = "-compilertracking" }
 
 # Linux ARM64
 [[tool.cibuildwheel.overrides]]
+# Install vcpkg inside Linux manylinux containers
+before-all = [
+    "apt install -y zip unzip tar curl",
+    "if [ ! -d \"$HOME/vcpkg\" ]; then git clone https://github.com/microsoft/vcpkg.git $HOME/vcpkg; fi",
+    "$HOME/vcpkg/bootstrap-vcpkg.sh",
+]
 select = "*-manylinux_aarch64"
 environment = { PIP_ONLY_BINARY = "numpy", VCPKG_ROOT = "$HOME/vcpkg", VCPKG_DEFAULT_TRIPLET = "arm64-linux-mixed", VCPKG_FEATURE_FLAGS = "-compilertracking" }
