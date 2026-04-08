@@ -26,9 +26,9 @@ jobs:
       - name: Set up vcpkg (macOS)
         if: runner.os == 'macOS'
         run: |
-          git clone https://github.com/microsoft/vcpkg.git /opt/vcpkg
-          /opt/vcpkg/bootstrap-vcpkg.sh
-          echo "VCPKG_ROOT=/opt/vcpkg" >> $GITHUB_ENV
+          git clone https://github.com/microsoft/vcpkg.git $HOME/vcpkg
+          $HOME/vcpkg/bootstrap-vcpkg.sh
+          echo "VCPKG_ROOT=$HOME/vcpkg" >> $GITHUB_ENV
 
       - name: Set up vcpkg (Windows)
         if: runner.os == 'Windows'
@@ -76,7 +76,7 @@ jobs:
     if: github.event_name == 'push' && startsWith(github.ref, 'refs/tags/v')
     environment:
       name: pypi
-      url: https://pypi.org/p/oge-py
+#      url: https://pypi.org/p/oge-py
     permissions:
       id-token: write
 

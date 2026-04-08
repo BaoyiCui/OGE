@@ -73,8 +73,8 @@ manylinux-aarch64-image = "manylinux_2_28"
 
 # Install vcpkg inside Linux manylinux containers
 before-all = [
-    "git clone https://github.com/microsoft/vcpkg.git /opt/vcpkg",
-    "/opt/vcpkg/bootstrap-vcpkg.sh",
+    "git clone https://github.com/microsoft/vcpkg.git $HOME/vcpkg",
+    "$HOME/vcpkg/bootstrap-vcpkg.sh",
 ]
 
 [tool.cibuildwheel.environment]
@@ -84,10 +84,10 @@ VCPKG_FEATURE_FLAGS = "-compilertracking"
 # macOS arm64
 [[tool.cibuildwheel.overrides]]
 select = "*-macosx_arm64"
-environment = { PIP_ONLY_BINARY = "numpy", VCPKG_ROOT = "/opt/vcpkg", VCPKG_DEFAULT_TRIPLET = "arm64-osx-mixed", VCPKG_FEATURE_FLAGS = "-compilertracking", MACOSX_DEPLOYMENT_TARGET = "13.0" }
+environment = { PIP_ONLY_BINARY = "numpy", VCPKG_ROOT = "$HOME/vcpkg", VCPKG_DEFAULT_TRIPLET = "arm64-osx-mixed", VCPKG_FEATURE_FLAGS = "-compilertracking", MACOSX_DEPLOYMENT_TARGET = "13.0" }
 before-all = [
-    "git clone https://github.com/microsoft/vcpkg.git /opt/vcpkg",
-    "/opt/vcpkg/bootstrap-vcpkg.sh",
+    "git clone https://github.com/microsoft/vcpkg.git $HOME/vcpkg",
+    "$HOME/vcpkg/bootstrap-vcpkg.sh",
 ]
 
 # Windows amd64
@@ -102,9 +102,9 @@ before-all = [
 # Linux x86-64
 [[tool.cibuildwheel.overrides]]
 select = "*-manylinux_x86_64"
-environment = { PIP_ONLY_BINARY = "numpy", VCPKG_ROOT = "/opt/vcpkg", VCPKG_DEFAULT_TRIPLET = "x64-linux-mixed", VCPKG_FEATURE_FLAGS = "-compilertracking" }
+environment = { PIP_ONLY_BINARY = "numpy", VCPKG_ROOT = "$HOME/vcpkg", VCPKG_DEFAULT_TRIPLET = "x64-linux-mixed", VCPKG_FEATURE_FLAGS = "-compilertracking" }
 
 # Linux ARM64
 [[tool.cibuildwheel.overrides]]
 select = "*-manylinux_aarch64"
-environment = { PIP_ONLY_BINARY = "numpy", VCPKG_ROOT = "/opt/vcpkg", VCPKG_DEFAULT_TRIPLET = "arm64-linux-mixed", VCPKG_FEATURE_FLAGS = "-compilertracking" }
+environment = { PIP_ONLY_BINARY = "numpy", VCPKG_ROOT = "$HOME/vcpkg", VCPKG_DEFAULT_TRIPLET = "arm64-linux-mixed", VCPKG_FEATURE_FLAGS = "-compilertracking" }
