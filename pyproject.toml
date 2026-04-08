@@ -10,7 +10,7 @@ name = "oge-py"
 description = "The Orbital Game Environment (OGE)."
 readme = "README.md"
 requires-python = ">=3.10"
-license = "MIT"
+license = "GPL-2.0-or-later"
 license-files = ["LICENSE.md"]
 keywords = ["reinforcement-learning", "orbital-game-environment"]
 authors = [
@@ -38,6 +38,11 @@ dependencies = [
 ]
 dynamic = ["version"]
 
+[project.urls]
+Homepage = "https://github.com/BaoyiCui/OGE"
+Repository = "https://github.com/BaoyiCui/OGE"
+Issues = "https://github.com/BaoyiCui/OGE/issues"
+
 [project.optional-dependencies]
 vector = [
     "gymnasium>=1.2.0"
@@ -46,17 +51,6 @@ test = [
     "pytest>=7.0",
     "gymnasium>=1.2.0"
 ]
-# 避免 ROS2 Jazzy 的插件注册为 pytest 插件
-#[tool.pytest.ini_options]
-#addopts = """
-#  -p no:launch_testing
-#  -p no:launch-testing-ros
-#  -p no:ament-lint
-#  -p no:ament-pep257
-#  -p no:ament-xmllint
-#  -p no:ament-copyright
-#  -p no:ament-flake8
-#"""
 
 [tool.scikit-build]
 cmake.args = [

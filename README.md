@@ -95,8 +95,7 @@ Install the `skrl` library
 
 ```bash
 conda activate oge
-cd third_party/skrl-1.4.3
-pip install -e ".["torch"]"
+pip install "skrl[torch]==1.4.3"
 ```
 
 ## 2. Install OGE

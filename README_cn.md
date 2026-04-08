@@ -95,8 +95,7 @@ pip install -r requirements.txt -i https://pypi.mirrors.ustc.edu.cn/simple/
 
 ```bash
 conda activate oge
-cd third_party/skrl-1.4.3
-pip install -e ".["torch"]" -i https://mirrors.ustc.edu.cn/pypi/simple
+pip install "skrl[torch]==1.4.3" -i https://mirrors.ustc.edu.cn/pypi/simple
 ```
 
 ## 2. 安装 OGE

@@ -44,3 +44,4 @@ cmake-build-release/
 build/
 wandb/
 runs/
+third_party/
