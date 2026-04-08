@@ -1,38 +1,52 @@
-# OGE
+# OGE (Orbital Game Environment)
 
-## 1. 开发环境配置
+OGE is a reinforcement learning environment for orbital game scenarios, focusing on spacecraft pursuit-evasion games. The environment provides a Gymnasium-compatible interface with a high-performance C++ backend and Python bindings for easy integration with mainstream reinforcement learning frameworks (such as SKRL).
 
-### 1.1 更新 gcc
+## Features
 
-安装 GCC 13
+- 🚀 High-performance orbital dynamics simulation (C++ backend)
+- 🎮 Gymnasium-compatible reinforcement learning environment interface
+- 🤖 Multi-agent pursuit-evasion game scenarios
+- 📊 Integration with SKRL reinforcement learning library, supporting PPO and other algorithms
+- 🔧 Flexible environment configuration system
 
-```
+## License
+
+This project is licensed under the [GNU General Public License v2.0](LICENSE.md).
+
+## 1. Development Environment Setup
+
+### 1.1 Update GCC
+
+Install GCC 13
+
+```bash
 sudo apt update
 sudo apt install build-essential gcc-13 g++-13
 ```
 
-设置为默认版本
+Set as default version
 
-```
+```bash
 sudo update-alternatives --install /usr/bin/gcc gcc /usr/bin/gcc-13 100
 sudo update-alternatives --install /usr/bin/g++ g++ /usr/bin/g++-13 100
 ```
 
-如果系统里有多个版本，可以用以下命令切换：
+If you have multiple versions installed, you can switch between them:
 
-```
-sudo update-alternatives --config gcc                                                                                                                                                                                
+```bash
+sudo update-alternatives --config gcc
 sudo update-alternatives --config g++
 ```
 
-安装完后验证：
+Verify the installation:
 
-```
-gcc --version                                                                                                                                                                                                        
+```bash
+gcc --version
 g++ --version
 ```
 
-输出类似如下内容：
+Expected output:
 
 ```text
 (oge) ➜  OGE git:(main) ✗ gcc --version
@@ -48,9 +62,9 @@ This is free software; see the source for copying conditions.  There is NO
 warranty; not even for MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
 ```
 
-### 1.2 安装 vcpkg
+### 1.2 Install vcpkg
 
-克隆 `vcpkg` 并且执行安装
+Clone `vcpkg` and run the installation script
 
 ```bash
 git clone https://www.github.com/microsoft/vcpkg
@@ -58,7 +72,7 @@ cd vcpkg
 ./bootstrap-vcpkg.sh
 ```
 
-将以下内容添加到 `~/.bashrc` 或者 `~/.zshrc`
+Add the following to your `~/.bashrc` or `~/.zshrc`
 
 ```bash
 # >>> vcpkg
@@ -67,33 +81,41 @@ export PATH=$VCPKG_ROOT:$PATH
 # <<< vcpkg
 ```
 
-### 1.3 Python 环境配置
+### 1.3 Python Environment Setup
 
-创建 `conda` 环境并且安装基础依赖
+Create a `conda` environment and install dependencies
 
 ```bash
 conda create -n oge python=3.13
 conda activate oge
-pip install -r requirements.txt -i https://pypi.mirrors.ustc.edu.cn/simple/
+pip install -r requirements.txt
 ```
 
-安装 `skrl` 库
+Install the `skrl` library
 
 ```bash
 conda activate oge
 cd third_party/skrl-1.4.3
-pip install -e ".["torch"]" -i https://mirrors.ustc.edu.cn/pypi/simple
+pip install -e ".["torch"]"
 ```
 
-## 2. 安装 OGE
+## 2. Install OGE
 
 ```bash
 conda activate oge
 pip install .
 ```
 
-## 3. 运行 SKRL 训练示例
+## 3. Run SKRL Training Example
 
 ```bash
 python scripts/train.py
 ```
+
+## Citation
+
+If you use OGE in your research, please cite this repository.
+
+## Contributing
+
+Contributions are welcome! Please feel free to submit a Pull Request.
